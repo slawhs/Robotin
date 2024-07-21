@@ -1,5 +1,6 @@
 # Robotin
 
+
 python version: [3.12.3](https://www.python.org/downloads/release/python-3123/)
 install [Torch](https://pytorch.org/get-started/locally/): pip3 install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu124
 
@@ -34,3 +35,8 @@ button_d: start face reckoning
 button_s: stop face reckoning
 
 button_l: start listening
+
+
+
+
+' fastapi dev server.py '
