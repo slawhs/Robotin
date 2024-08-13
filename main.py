@@ -4,6 +4,9 @@ from random import randint
 from PyQt6.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QLabel
 from PyQt6.QtGui import QPainter, QBrush, QColor, QMouseEvent, QPixmap
 from PyQt6.QtCore import Qt, QPoint, QTimer
+from ultralytics import YOLO
+import cv2 
+import torch
 
 
 class Face(QWidget):
@@ -14,7 +17,7 @@ class Face(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
 
-        self.setMouseTracking(True);
+        self.setMouseTracking(True)
 
         self.scale = 10
 
@@ -102,6 +105,17 @@ class Face(QWidget):
             int(self.c_y + (event.pos().y() - self.c_y) * 0.45) + int(8 * self.scale)
         )
         self.update()
+    
+    def faceDetectionMove(self, facepos):
+        self.centro_ojos = QPoint(
+            int(self.c_x + (facepos[0]*self.width() - self.c_x) * 0.5),
+            int(self.c_y + (facepos[1]*self.height() - self.c_y) * 0.5)
+        )
+        self.centro_boca = QPoint(
+            int(self.c_x + (facepos[0]*self.width() - self.c_x) * 0.45),
+            int(self.c_y + (facepos[1]*self.height() - self.c_y) * 0.45) + int(8 * self.scale)
+        )
+        self.update()
 
     def blink(self):
         self.blink_count += self.blink_step
@@ -166,9 +180,9 @@ class MainWindow(QMainWindow):
         # self.resize(200, 400)
         self.showFullScreen()
 
-
         self.layout = QVBoxLayout()
         self.face = Face()
+        self.face_detection = FaceDetection(self.face)
         self.layout.addWidget(self.face, 3)
 
         self.layout.addWidget(TextBox("sas", self), 1)
@@ -201,8 +215,66 @@ class MainWindow(QMainWindow):
             self.layout.itemAt(2).widget().show()
         if event.key() == Qt.Key.Key_Space:
             self.layout.itemAt(0).widget().speaking = not self.layout.itemAt(0).widget().speaking
+        
+        if self.face_detection.state == "Off":
+            if event.key() == Qt.Key.Key_D: # Cambiamos a deteccion si apretamos D y no estamos en deteccion
+                self.face.setMouseTracking(False)
+                self.face_detection.detect()
+        
+            if event.key() == Qt.Key.Key_S: # Cambiamos a mouse follow si apretamos S y no estamos en deteccion
+                self.face.setMouseTracking(True)
+
+        # Para apagar la deteccion debemos presionar Q imentras estamos en deteccion
+            
 
 
+class FaceDetection:
+    def __init__(self, robotin):
+        # device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        self.robotin = robotin
+        self.device = torch.device("cpu")
+        model = YOLO("best2.pt")
+        self.model = model.to(self.device)
+        self.facepos = None
+        self.state = "Off"
+
+    def detect(self):
+        self.state = "On"
+        cap = cv2.VideoCapture(0)
+        while True:
+            ret, frame = cap.read()
+
+            # Realizamos la deteccion
+            results = self.model(frame)
+
+            # Encontramos el bounding box mas grande
+            max_area = 0
+            max_bb = None
+            for result in results[0].boxes:  # Accede a los resultados de las cajas
+                x1, y1, x2, y2 = result.xyxy[0].cpu().numpy().astype(int)
+                area = (x2 - x1) * (y2 - y1)
+                if area > max_area:
+                    max_area = area
+                    max_bb = result
+
+            if max_bb is not None:
+                x1, y1, x2, y2 = max_bb.xyxy[0].cpu().numpy().astype(int)
+                # cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
+                # label = f'{self.model.names[int(max_bb.cls[0].cpu().numpy())]} {max_bb.conf[0].cpu().numpy():.2f}'
+                # cv2.putText(frame, label, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+                # print(f'Centro: {(x1 + x2) / 2}, {(y1 + y2) / 2}')
+                self.robotin.faceDetectionMove((
+                    (640 - ((x1 + x2) / 2)) / 640,
+                    ((y1 + y2) / 2) /480
+                    ))
+
+            # cv2.imshow("frame", frame)
+
+            if cv2.waitKey(1) & 0xFF == ord('q'):
+                cv2.destroyAllWindows()
+                cap.release()
+                self.state = "Off"
+                break
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
