@@ -21,7 +21,7 @@ class FaceDetection(QObject):
 
     def set_model(self):
         self.device = torch.device(DEVICE)
-        self.model = YOLO(MODEL).to(self.device)
+        self.model = YOLO("models/"+MODEL).to(self.device)
 
     def start_detection(self):
         self.state = 1

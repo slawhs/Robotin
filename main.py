@@ -180,7 +180,7 @@ class MainWindow(QMainWindow):
         self.layout.addWidget(self.face, 3)
 
         self.layout.addWidget(TextBox("sas", self), 1)
-        pixmap = QPixmap('wasil.jpg')
+        pixmap = QPixmap('src/wasil.jpg')
         pixmap.scaled(300, 300, Qt.AspectRatioMode.KeepAspectRatio)
         image_label = QLabel()
         image_label.setPixmap(pixmap)
