@@ -25,5 +25,3 @@ if __name__ == "__main__":
         speak(text)
         if text == "exit":
             break
-
-
