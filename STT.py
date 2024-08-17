@@ -11,7 +11,7 @@ def listen():
         print("Say something!")
         audio = r.listen(source, phrase_time_limit=7)
     try:
-        return r.recognize_google(audio)
+        return r.recognize_google(audio, language="es-ES")
     except sr.UnknownValueError:
         return "Could not understand audio"
     except sr.RequestError as e:
