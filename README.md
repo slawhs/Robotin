@@ -14,9 +14,23 @@ py -m pip install --upgrade pip
 py -m pip install -r .\requirements.txt
 ```
 
-## Run
+### Run
 
 ```
 .\.env\Scripts\activate
 py main.py
 ```
+
+
+## Commands
+
+button_1: normal face
+button_2: text box
+button_3: show image
+
+space: toggle speaking
+
+button_d: start face reckoning
+button_s: stop face reckoning
+
+button_l: start listening
