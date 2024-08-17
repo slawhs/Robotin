@@ -1,9 +1,9 @@
-import sys
-from time import sleep
-from random import randint
 from PyQt6.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QLabel
 from PyQt6.QtGui import QPainter, QBrush, QColor, QMouseEvent, QPixmap
 from PyQt6.QtCore import Qt, QPoint, QTimer
+from face_detection import FaceDetection
+from PyQt6.QtCore import pyqtSignal
+import sys
 
 
 class Face(QWidget):
@@ -14,7 +14,7 @@ class Face(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
 
-        self.setMouseTracking(True);
+        self.setMouseTracking(True)
 
         self.scale = 10
 
@@ -33,6 +33,13 @@ class Face(QWidget):
         self.speak_timer = QTimer(self)
         self.speak_timer.timeout.connect(self.speak)
         self.speak_timer.start(self.speak_step)
+
+        self.pose = QPoint(self.c_x, self.c_y)
+        self.target = QPoint(self.c_x, self.c_y)
+        self.face_timer = QTimer(self)
+        self.face_timer.timeout.connect(self.move_face)
+        self.face_timer.start(10)
+
 
         # self.move_timer = QTimer(self)
         # self.move_timer.timeout.connect(self.move_face)
@@ -91,15 +98,18 @@ class Face(QWidget):
             int(0.55 * self.scale),
             int(0.55 * self.scale))
 
+    def mouseMoveEvent(self, event):
+        self.target = event.pos()
 
-    def mouseMoveEvent(self, event: QMouseEvent):
+    def move_face(self):
+        self.step_face()
         self.centro_ojos = QPoint(
-            int(self.c_x + (event.pos().x() - self.c_x) * 0.5),
-            int(self.c_y + (event.pos().y() - self.c_y) * 0.5)
+            int(self.c_x + (self.pose.x() - self.c_x) * 0.5),
+            int(self.c_y + (self.pose.y() - self.c_y) * 0.5)
         )
         self.centro_boca = QPoint(
-            int(self.c_x + (event.pos().x() - self.c_x) * 0.45),
-            int(self.c_y + (event.pos().y() - self.c_y) * 0.45) + int(8 * self.scale)
+            int(self.c_x + (self.pose.x() - self.c_x) * 0.45),
+            int(self.c_y + (self.pose.y() - self.c_y) * 0.45) + int(8 * self.scale)
         )
         self.update()
 
@@ -126,27 +136,22 @@ class Face(QWidget):
             self.speak_count = 100
             self.mouth_size = 1
 
+    def step_face(self):
+        self.pose = QPoint(
+            int(self.pose.x() + (self.target.x() - self.pose.x()) * 0.3),
+            int(self.pose.y() + (self.target.y() - self.pose.y()) * 0.3)
+        )
+        # print(self.pose, self.target)
+
+    def face_detectio_target(self, x, y):
+        self.target = QPoint(
+            int(self.width()  * x * 0.6 + self.width()  * 0.15),
+            int(self.height() * y * 0.8 + self.height() * 0.1)
+        )
+
     def mousePressEvent(self, event: QMouseEvent | None) -> None:
         self.blink_count = 75
 
-    # def move_face(self):
-
-    #     if self.move_ == 0:
-    #         if randint(0, 100) < 10:
-    #             self.move_ = 1
-    #             self.target = QPoint(randint(0, self.width()), randint(int(self.height()*0.4), self.height()))
-
-    #     else:
-
-    #         self.centro_ojos = QPoint(
-    #             int(self.c_x + (event.pos().x() - self.c_x) * 0.5),
-    #             int(self.c_y + (event.pos().y() - self.c_y) * 0.5)
-    #         )
-    #         self.centro_boca = QPoint(
-    #             int(self.c_x + (event.pos().x() - self.c_x) * 0.45),
-    #             int(self.c_y + (event.pos().y() - self.c_y) * 0.45) + int(8 * self.scale)
-    #         )
-    #         self.update()
 
 
 class TextBox(QLabel):
@@ -159,13 +164,16 @@ class TextBox(QLabel):
 
 
 class MainWindow(QMainWindow):
+
+    signal_start_detection = pyqtSignal()
+    signal_stop_detection = pyqtSignal()
+
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Robotin")
         self.setStyleSheet("background-color: rgb(194,216,214);")
         # self.resize(200, 400)
         self.showFullScreen()
-
 
         self.layout = QVBoxLayout()
         self.face = Face()
@@ -202,10 +210,24 @@ class MainWindow(QMainWindow):
         if event.key() == Qt.Key.Key_Space:
             self.layout.itemAt(0).widget().speaking = not self.layout.itemAt(0).widget().speaking
 
+        if event.key() == Qt.Key.Key_D:
+            self.face.setMouseTracking(False)
+            self.signal_start_detection.emit()
+        if event.key() == Qt.Key.Key_S:
+            self.face.setMouseTracking(True)
+            self.signal_stop_detection.emit()
 
 
 if __name__ == "__main__":
+
     app = QApplication(sys.argv)
+
+    facedetection = FaceDetection()
     window = MainWindow()
+
+    window.signal_start_detection.connect(facedetection.start_detection)
+    window.signal_stop_detection.connect(facedetection.stop_detection)
+    facedetection.sender_pose.connect(window.face.face_detectio_target)
+
     window.show()
     sys.exit(app.exec())
