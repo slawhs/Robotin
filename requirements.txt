@@ -2,3 +2,7 @@ PyQt6 == 6.7.0
 omegaconf == 2.3.0
 opencv-python == 4.10.0.84
 ultralytics == 8.2.76
+torch == 2.4.0+cu124
+SpeechRecognition == 3.10.4
+PyAudio == 0.2.14
+pyttsx3 == 2.91
