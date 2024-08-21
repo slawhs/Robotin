@@ -38,7 +38,7 @@ class MainWindow(QMainWindow):
 
 
         self.text_box.hide()
-        # self.image_label.hide()
+        self.image_label.hide()
 
 
         self.central_widget = QWidget()
