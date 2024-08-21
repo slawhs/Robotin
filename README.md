@@ -22,6 +22,11 @@ py -m pip install -r .\requirements.txt
 py main.py
 ```
 
+### Run server
+```
+fastapi dev server.py
+```
+
 
 ## Commands
 
@@ -39,4 +44,4 @@ button_l: start listening
 
 
 
-' fastapi dev server.py '
+
