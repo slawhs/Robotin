@@ -29,8 +29,8 @@ class Images(QLabel):
             self.pixmaps.append(pixmap)
 
     def change_image(self):
-        # self.current_image += 1
-        self.current_image = (self.current_image + 1) % len(self.pixmaps)
+        self.current_image += 1
+        self.current_image %= len(self.pixmaps)
         self.setPixmap(self.pixmaps[self.current_image])
         self.setScaledContents(True)
 

@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div>
+
+    <form action="/upload-files/" enctype="multipart/form-data" method="post">
+        <div>
+            <label>Upload Files</label>
+            <input name="files" type="file" multiple accept=".jpg, .png">
+        </div>
+        <div>
+            <input type="submit" class="submit button">
+        </div>
+    </form>
+
+    <div>
+    {% for rs in show %}
+        <div class="image_label">
+            <img width="500" src="{{ url_for('images', path=rs) }}">
+            <form action="/" method="post">
+                <p hidden><input name="name" value="{{rs}}"></p>
+                <input type="submit" class="submit button">
+            </form>
+        </div>
+    {% endfor %}
+    </div>
+
+</div>
+{% endblock content %}
