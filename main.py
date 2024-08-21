@@ -1,9 +1,9 @@
 from PyQt6.QtWidgets import QApplication
-from face import MainWindow
+from main_window import MainWindow
 import sys
 
-FACE_DETECTION = True
-SPEECH_RECOGNITION = True
+FACE_DETECTION = False
+SPEECH_RECOGNITION = False
 
 if __name__ == "__main__":
 
