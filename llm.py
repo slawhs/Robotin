@@ -8,19 +8,32 @@ class Llama(QObject):
 
     def __init__(self):
         super().__init__()
+        self.set_messages()
+
+    def set_messages(self):
+        with open("src/LLM/base.txt", "r") as f:
+            self.messages = [
+                {"role": "user", "content": f.read()},
+                {"role": "assistant", "content": """¡Hola! Soy Robotin, un asistente universitario con experiencia en la UC. Estoy aquí para ayudarte con cualquier
+pregunta o inquietud que tengas sobre el campus o tu carrera en Ingeniería Civil.
+
+¿Qué necesitas saber? ¡No dudes en preguntar! 🤔"""},
+            ]
+
+    def add_message(self, message, role="user"):
+        self.messages.append({"role": role, "content": message})
 
     def llama_thread(self, message):
         connection_thread = Thread(target=self.llama, args=(message,), daemon=True)
         connection_thread.start()
 
     def llama(self, message):
-        response = ollama.chat(
-            model="llama3",
-            messages=[
-                {
-                    "role": "user",
-                    "content": message,
-                },
-            ],
-        )
+        self.add_message(message)
+
+        response = ollama.chat(model="llama3", messages=self.messages)
+
+        # print(response["message"]["content"])
+
         self.response_signal.emit(response["message"]["content"])
+
+        self.add_message(response["message"]["content"], role="assistant")

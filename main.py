@@ -2,7 +2,7 @@ from PyQt6.QtWidgets import QApplication
 from modules.main_window import MainWindow
 import sys
 
-FACE_DETECTION = True
+FACE_DETECTION = False
 LLM = True
 
 if __name__ == "__main__":
