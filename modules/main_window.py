@@ -81,6 +81,17 @@ class MainWindow(QMainWindow):
 
     def speech_detected(self, text):
         self.face.speaking = True
-        self.text_box.setText(text)
+        self.text_box.setText(ajust_text(text))
         self.text_box.show()
         self.image_label.hide()
+
+
+def ajust_text(text):
+    text = text.split("\n")
+    i = 0
+    while i < len(text):
+        if len(text[i]) > 100:
+            text.insert(i+1, text[i][100:])
+            text[i] = text[i][:100]
+        i += 1
+    return "\n".join(text)
