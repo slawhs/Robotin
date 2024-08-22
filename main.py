@@ -2,8 +2,8 @@ from PyQt6.QtWidgets import QApplication
 from modules.main_window import MainWindow
 import sys
 
-FACE_DETECTION = False
 LLM = True
+FACE_DETECTION = True
 
 if __name__ == "__main__":
 
@@ -21,8 +21,8 @@ if __name__ == "__main__":
         facedetection.sender_pose.connect(window.face.face_detectio_target)
 
     if LLM:
-        from sst import SpeechToText
-        from llm import Llama
+        from modules.sst import SpeechToText
+        from modules.llm import Llama
 
         stt_ = SpeechToText()
         llm_ = Llama()

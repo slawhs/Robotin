@@ -1,4 +1,5 @@
 from PyQt6.QtCore import pyqtSignal, QObject
+from src.LLM.base_messages import messages
 from threading import Thread
 import ollama
 
@@ -12,13 +13,7 @@ class Llama(QObject):
 
     def set_messages(self):
         with open("src/LLM/base.txt", "r") as f:
-            self.messages = [
-                {"role": "user", "content": f.read()},
-                {"role": "assistant", "content": """¡Hola! Soy Robotin, un asistente universitario con experiencia en la UC. Estoy aquí para ayudarte con cualquier
-pregunta o inquietud que tengas sobre el campus o tu carrera en Ingeniería Civil.
-
-¿Qué necesitas saber? ¡No dudes en preguntar! 🤔"""},
-            ]
+            self.messages = messages
 
     def add_message(self, message, role="user"):
         self.messages.append({"role": role, "content": message})
@@ -29,11 +24,6 @@ pregunta o inquietud que tengas sobre el campus o tu carrera en Ingeniería Civi
 
     def llama(self, message):
         self.add_message(message)
-
         response = ollama.chat(model="llama3", messages=self.messages)
-
-        # print(response["message"]["content"])
-
         self.response_signal.emit(response["message"]["content"])
-
         self.add_message(response["message"]["content"], role="assistant")
