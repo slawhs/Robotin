@@ -1,9 +1,9 @@
 from PyQt6.QtWidgets import QApplication
-from main_window import MainWindow
+from modules.main_window import MainWindow
 import sys
 
-FACE_DETECTION = False
-SPEECH_RECOGNITION = False
+FACE_DETECTION = True
+SPEECH_RECOGNITION = True
 
 if __name__ == "__main__":
 
@@ -12,7 +12,7 @@ if __name__ == "__main__":
     window = MainWindow()
 
     if FACE_DETECTION:
-        from face_detection import FaceDetection
+        from modules.face_detection import FaceDetection
 
         facedetection = FaceDetection()
 
@@ -21,7 +21,7 @@ if __name__ == "__main__":
         facedetection.sender_pose.connect(window.face.face_detectio_target)
 
     if SPEECH_RECOGNITION:
-        from sst import SpeechToText
+        from modules.sst import SpeechToText
 
         stt_ = SpeechToText()
 
