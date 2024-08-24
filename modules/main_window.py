@@ -34,7 +34,6 @@ class MainWindow(QMainWindow):
 
         # add web view
         self.webview = QWebEngineView()
-        # self.webview.load(QUrl("https://www.python.org/"))
         self.webview.load(QUrl("https://v2.ubicate.osuc.dev/map?place=B12"))
         self.webview.hide()
 
