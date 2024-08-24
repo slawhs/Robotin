@@ -48,9 +48,10 @@ class Face(QWidget):
         return int(self.height()/2)
 
     def resizeEvent(self, event):
-        self.scale = min(event.size().height()*0.015, event.size().width()*0.015)
+        self.scale = min(event.size().height()*0.015, event.size().width()*0.01)
         self.centro_ojos = QPoint(self.c_x, self.c_y)
         self.centro_boca = QPoint(self.c_x, self.c_y + int(self.scale*8))
+        self.target_cero()
 
     def paintEvent(self, event):
         painter = QPainter(self)
@@ -139,6 +140,9 @@ class Face(QWidget):
             int(self.width()  * x * 0.6 + self.width()  * 0.15),
             int(self.height() * y * 0.8 + self.height() * 0.1)
         )
+
+    def target_cero(self):
+        self.target = QPoint(self.c_x, self.c_y)
 
     def mousePressEvent(self, event: QMouseEvent | None) -> None:
         self.blink_count = 75

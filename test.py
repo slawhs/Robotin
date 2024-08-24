@@ -1,28 +1,75 @@
-def ajunt_text(text):
-    text = text.split("\n")
-    i = 0
-    while i < len(text):
-        if len(text[i]) > 100:
-            text.insert(i+1, text[i][100:])
-            text[i] = text[i][:100]
-        i += 1
-    return "\n".join(text)
+#
+#
+#       Simple PyQt/PySide Web Browser.
+#
+#       pythonassets.com
+#
+#
+
+import sys
+
+from PyQt6.QtCore import QUrl
+from PyQt6.QtWidgets import QApplication, QHBoxLayout, QLineEdit
+from PyQt6.QtWidgets import QMainWindow, QPushButton, QVBoxLayout
+from PyQt6.QtWidgets import QWidget
+from PyQt6.QtWebEngineWidgets import QWebEngineView
 
 
-print(ajunt_text("""
-oaooooo
+class Widgets(QMainWindow):
 
-ntreodintr dant unatu notun atruntaore untaeua
-au aoeuraoeturnatr ua anutaoeutnran anetur auaoe uaoeu taoe uaoe
-uaoeu aoeutrbaoet ua
-    taoetunraoetuaeotu anteour nate urnateour aeua oewu atoeb utaobe utaboe utbao eubao eub aoeub aoebu aoteb uaoe
-    uaoeu aoteu aoteu atoeu atose uatoe uaoea
-    aoenu aoe naeo kaneo kna oekna oenr aso ksan rona roea
-    taoetunraoetuaeotu anteour nate urnateour aeua oewu atoeb utaobe utaboe utbao eubao eub aoeub aoebu aoteb uaoe
-    taoetunraoetuaeotu anteour nate urnateour aeua oewu atoeb utaobe utaboe utbao eubao eub aoeub aoebu aoteb uaoe
-    taoetunraoetuaeotu anteour nate urnateour aeua oewu atoeb utaobe utaboe utbao eubao euboooooooooooooooooooooooooooooooo aoeub aoebu aoteb uaoe
-    taoetunraoetuaeotu anteour nate urnateour aeua oewu atoeb utaobe utaboe utbao eubao eub aoeub aoebu aoteb uaoe
-    taoetunraoetuaeotu anteour nate urnateour aeua oewu atoeb utaobe utaboe utbao eubao eub aoeub aoebu aoteb uaoe
-    taoetunraoetuaeotu anteour nate urnateour aeua oewu atoeb utaobe utaboe utbao eubao eub aoeub aoebu aoteb uaoe
-    taoetunraoetuaeotu anteour nate urnateour aeua oewu atoeb utaobe utaboe utbao eubao eub aoeub aoebu aoteb uaoe
-                 """))
+    def __init__(self):
+        QMainWindow.__init__(self)
+        self.setWindowTitle("Simple Web Browser")
+        self.widget = QWidget(self)
+
+        # Where the webpage is rendered.
+        self.webview = QWebEngineView()
+        self.webview.load(QUrl("https://www.python.org/"))
+        self.webview.urlChanged.connect(self.url_changed)
+
+        # Navigation buttons.
+        self.back_button = QPushButton("<")
+        self.back_button.clicked.connect(self.webview.back)
+        self.forward_button = QPushButton(">")
+        self.forward_button.clicked.connect(self.webview.forward)
+        self.refresh_button = QPushButton("Refresh")
+        self.refresh_button.clicked.connect(self.webview.reload)
+
+        # URL address bar.
+        self.url_text = QLineEdit()
+
+        # Button to load the current page.
+        self.go_button = QPushButton("Go")
+        self.go_button.clicked.connect(self.url_set)
+
+        self.toplayout = QHBoxLayout()
+        self.toplayout.addWidget(self.back_button)
+        self.toplayout.addWidget(self.forward_button)
+        self.toplayout.addWidget(self.refresh_button)
+        self.toplayout.addWidget(self.url_text)
+        self.toplayout.addWidget(self.go_button)
+
+        self.layout = QVBoxLayout()
+        self.layout.addLayout(self.toplayout)
+        self.layout.addWidget(self.webview)
+
+        self.widget.setLayout(self.layout)
+        self.setCentralWidget(self.widget)
+
+    def url_changed(self, url):
+        """Refresh the address bar"""
+        self.url_text.setText(url.toString())
+
+    def url_set(self):
+        """Load the new URL"""
+        self.webview.setUrl(QUrl(self.url_text.text()))
+
+
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+    window = Widgets()
+    window.show()
+    try:
+        sys.exit(app.exec_())
+    except AttributeError:
+        sys.exit(app.exec())

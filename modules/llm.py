@@ -27,3 +27,4 @@ class Llama(QObject):
         response = ollama.chat(model="llama3", messages=self.messages)
         self.response_signal.emit(response["message"]["content"])
         self.add_message(response["message"]["content"], role="assistant")
+        return response["message"]["content"]

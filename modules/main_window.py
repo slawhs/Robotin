@@ -1,10 +1,13 @@
-from PyQt6.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QLabel
+from PyQt6.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QHBoxLayout
 from PyQt6.QtGui import QPainter, QBrush, QColor, QMouseEvent, QPixmap
-from PyQt6.QtCore import Qt, QPoint, QTimer
+from PyQt6.QtCore import Qt, QPoint, QTimer, QUrl
 from PyQt6.QtCore import pyqtSignal
 from labels.text_box import TextBox
 from labels.images import Images
 from labels.face import Face
+
+from PyQt6.QtWebEngineWidgets import QWebEngineView
+
 
 class MainWindow(QMainWindow):
 
@@ -24,21 +27,35 @@ class MainWindow(QMainWindow):
     def set_layout(self):
         self.layout = QVBoxLayout()
 
+        self.h_layout = QHBoxLayout()
+
         # add face
         self.face = Face()
-        self.layout.addWidget(self.face, 3)
+
+        # add web view
+        self.webview = QWebEngineView()
+        # self.webview.load(QUrl("https://www.python.org/"))
+        self.webview.load(QUrl("https://v2.ubicate.osuc.dev/map?place=B12"))
+        self.webview.hide()
+
+        # self.layout.addWidget(self.face, 3)
+        # self.layout.addWidget(self.webview, 20)
+
+        self.h_layout.addWidget(self.face, 1)
+        self.h_layout.addWidget(self.webview, 1)
+        self.layout.addLayout(self.h_layout, 3)
+
 
         # add text box
         self.text_box = TextBox("", self)
         self.layout.addWidget(self.text_box, 1)
+        self.text_box.hide()
 
         # add image label
         self.image_label = Images()
         self.layout.addWidget(self.image_label, 27)
-
-
-        self.text_box.hide()
         self.image_label.hide()
+
 
 
         self.central_widget = QWidget()
@@ -52,12 +69,19 @@ class MainWindow(QMainWindow):
         if event.key() == Qt.Key.Key_1:
             self.text_box.hide()
             self.image_label.hide()
+            self.webview.hide()
         if event.key() == Qt.Key.Key_2:
             self.text_box.show()
             self.image_label.hide()
+            self.webview.hide()
         if event.key() == Qt.Key.Key_3:
             self.text_box.hide()
             self.image_label.show()
+            self.webview.hide()
+        if event.key() == Qt.Key.Key_4:
+            self.text_box.hide()
+            self.image_label.hide()
+            self.webview.show()
         if event.key() == Qt.Key.Key_Space:
             self.face.speaking = not self.face.speaking
 
@@ -90,8 +114,8 @@ def ajust_text(text):
     text = text.split("\n")
     i = 0
     while i < len(text):
-        if len(text[i]) > 100:
-            text.insert(i+1, text[i][100:])
-            text[i] = text[i][:100]
+        if len(text[i]) > 80:
+            text.insert(i+1, text[i][80:])
+            text[i] = text[i][:80]
         i += 1
     return "\n".join(text)

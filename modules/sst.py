@@ -18,7 +18,9 @@ class SpeechToText(QObject):
         self.source = sr.Microphone()
 
     def ajust_noise(self):
-        self.recognizer.adjust_for_ambient_noise(self.source)
+        with self.source as source:
+            self.recognizer.adjust_for_ambient_noise(source)
+            print("Ruido ajustado")
 
     def voice_reckoning_thread(self):
         connection_thread = Thread(target=self.voice_reckoning, daemon=True)
@@ -36,4 +38,5 @@ class SpeechToText(QObject):
             except sr.RequestError as e:
                 text = f"Error al conectar con el servicio de reconocimiento de voz; {e}"
 
+            print(text)
             self.text_signal.emit(text)

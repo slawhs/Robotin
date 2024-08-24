@@ -8,7 +8,7 @@ class Images(QLabel):
     def __init__(self):
         super().__init__()
 
-        self.setStyleSheet("background-color: #000000; border-radius: 30px;")
+        self.setStyleSheet("background-color: #000000; border-radius: 30px !important;")
 
         self.load_pixmaps()
 
