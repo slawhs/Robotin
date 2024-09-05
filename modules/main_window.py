@@ -34,7 +34,7 @@ class MainWindow(QMainWindow):
 
         # add web view
         self.webview = QWebEngineView()
-        self.webview.load(QUrl("https://v2.ubicate.osuc.dev/map?place=B12"))
+        self.webview.load(QUrl("""https://www.google.com/maps/place/33°30'01.5"S+70°36'47.3"W/"""))
         self.webview.hide()
 
         # self.layout.addWidget(self.face, 3)

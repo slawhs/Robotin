@@ -3,7 +3,7 @@ from modules.main_window import MainWindow
 import sys
 
 LLM = True
-FACE_DETECTION = True
+FACE_DETECTION = False
 
 if __name__ == "__main__":
 
