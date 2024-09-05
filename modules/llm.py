@@ -1,7 +1,18 @@
 from PyQt6.QtCore import pyqtSignal, QObject
 from src.LLM.base_messages import messages
 from threading import Thread
-import ollama
+
+from llama_index.llms.ollama import Ollama
+from llama_index.core import (VectorStoreIndex, SimpleDirectoryReader,
+                              StorageContext, load_index_from_storage)
+from llama_index.core.agent import ReActAgent
+from llama_index.core.embeddings import resolve_embed_model
+from llama_index.core.tools import QueryEngineTool, ToolMetadata, FunctionTool
+from llama_index.core.query_engine import SubQuestionQueryEngine
+from llama_parse import LlamaParse
+from prompts import context
+from function_tools import place_query
+import os
 
 class Llama(QObject):
 
